@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ML / AI / MLOps Roadmap</title>
+<style>
+  :root{
+    --bg:#fbf7f2;--ink:#2a2a2a;--muted:#6b6b6b;--line:#e5dfd6;
+    --c1:#dceae8;--c2:#f4dede;--c3:#e8dcf0;--c4:#f5ead0;--c5:#dde4f0;--c6:#e6efd9;
+    --accent:#5b6e8c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  header{padding:40px 32px 8px;max-width:880px;margin:0 auto}
+  header h1{margin:0 0 4px;font-size:26px;font-weight:600;letter-spacing:-.5px}
+  header p{margin:0;color:var(--muted);font-size:13px}
+  main{max-width:880px;margin:0 auto;padding:8px 32px 56px}
+  .stage{margin:18px 0;padding:18px 22px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .stage-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .num{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;background:var(--c5);padding:2px 8px;border-radius:8px}
+  .title{font-size:17px;font-weight:600;margin:0}
+  .when{margin-left:auto;font-size:11px;color:var(--muted)}
+  .goal{font-size:13px;color:var(--muted);margin:0 0 10px;font-style:italic}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  @media (max-width:640px){.row{grid-template-columns:1fr}}
+  .col h4{margin:0 0 4px;font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+  .col ol{margin:0;padding-left:20px;font-size:13px}
+  .col ol li{margin:3px 0}
+  .col ol li::marker{color:var(--accent);font-weight:600;font-size:11px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  a:hover{border-bottom-style:solid}
+  .proj{display:inline-block;background:var(--c4);padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600;color:#7a5a1c;margin-right:4px}
+  .done{background:var(--c6);color:#3e5e3e}
+  footer{max-width:880px;margin:0 auto;padding:8px 32px 40px;color:var(--muted);font-size:11px;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ML / AI / MLOps Roadmap</h1>
+  <p>Senior MTS → Senior ML/MLOps engineer · 26 weeks · 4–5 hrs/day · 10 projects</p>
+</header>
+
+<main>
+
+<div class="stage">
+  <div class="stage-head"><span class="num done">01 ✅</span><h2 class="title">Maths foundations</h2><span class="when">done</span></div>
+  <p class="goal">Linear algebra, calculus, eigen, PCA — covered via Imperial Maths4ML.</p>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">02</span><h2 class="title">Python &amp; data tooling</h2><span class="when">Week 1</span></div>
+  <p class="goal">Set up the workbench. NumPy/Pandas fluency.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://www.kaggle.com/learn/python">Kaggle — Python</a></li>
+      <li><a href="https://www.kaggle.com/learn/pandas">Kaggle — Pandas</a></li>
+      <li><a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy — Recipe for NNs</a> (bookmark)</li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Create <code>ml-journal</code> GitHub repo</li>
+      <li><a href="https://github.com/rougier/numpy-100">100 NumPy</a> — first 60</li>
+      <li><a href="https://github.com/guipsamora/pandas_exercises">100 Pandas</a> — first 10 sets</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">03</span><h2 class="title">Statistics &amp; EDA</h2><span class="when">Weeks 2–3</span></div>
+  <p class="goal">Two halves: classical stats, then ML evaluation. <span class="proj">P1</span> Titanic.</p>
+  <div class="row">
+    <div class="col"><h4>Week 2 — classical stats</h4><ol>
+      <li><a href="https://greenteapress.com/wp/think-stats-2e/">Think Stats 2e</a> ch 1–10 — read, run code, 1–2 exercises each</li>
+    </ol></div>
+    <div class="col"><h4>Week 3 — ML evaluation</h4><ol>
+      <li><a href="https://sebastianraschka.com/blog/2016/model-evaluation-selection-part1.html">Raschka — Model Evaluation pt 1–4</a> (1/day)</li>
+      <li><a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn — Cross-validation guide</a></li>
+      <li>StatQuest — 3 videos: ROC/AUC · Confusion Matrix · Bias-Variance</li>
+      <li><span class="proj">P1</span> Titanic: EDA + 3 baselines + stratified K-fold + calibration plot</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">04</span><h2 class="title">Classical ML</h2><span class="when">Weeks 4–5</span></div>
+  <p class="goal">scikit-learn pipelines, gradient boosting, SHAP. <span class="proj">P2</span> Tabular Kaggle top-50%.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://www.kaggle.com/learn/intermediate-machine-learning">Kaggle — Intermediate ML</a></li>
+      <li>Géron <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125967/">Hands-On ML 3e</a> ch 1–9</li>
+      <li><a href="https://christophm.github.io/interpretable-ml-book/">Interpretable ML</a> — SHAP / PDP chapters</li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Géron exercises ch 2, 3, 6, 7</li>
+      <li>Study <a href="https://www.kaggle.com/code/bextuychiev/lots-of-things-you-can-do-with-xgboost">XGBoost techniques</a></li>
+      <li><span class="proj">P2</span> Pipeline + XGBoost + Optuna + SHAP, top-50% Kaggle Playground</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">05</span><h2 class="title">Deep learning &amp; PyTorch</h2><span class="when">Weeks 6–9</span></div>
+  <p class="goal">Backprop, training loops from scratch. <span class="proj">P3</span> micrograd · <span class="proj">P4</span> CIFAR-10.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ">Karpathy — Zero to Hero</a> lectures 1–5</li>
+      <li>Andrew Ng DL <a href="https://www.coursera.org/learn/deep-neural-network">C2</a> + <a href="https://www.coursera.org/learn/machine-learning-projects">C3</a> (skip C1)</li>
+      <li><a href="https://www.learnpytorch.io/">learnpytorch.io</a> sections 00–04</li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li><span class="proj">P3</span> Reimplement <code>micrograd</code> + <code>makemore</code> from blank file</li>
+      <li><span class="proj">P4</span> MNIST → FashionMNIST → CIFAR-10 ResNet, beat 92%</li>
+      <li>Blog: "What I learned implementing backprop"</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">06</span><h2 class="title">CNNs &amp; sequence models</h2><span class="when">Weeks 10–12</span></div>
+  <p class="goal">Vision + sequences before transformers. <span class="proj">P5</span> Cassava · <span class="proj">P6</span> char-LSTM.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li>Andrew Ng DL <a href="https://www.coursera.org/learn/convolutional-neural-networks">C4 CNNs</a> + <a href="https://www.coursera.org/learn/nlp-sequence-models">C5 Sequence</a></li>
+      <li>CS231n <a href="https://cs231n.github.io/assignments2024/assignment2/">Assignment 2</a></li>
+      <li><a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">Colah — LSTMs</a></li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Complete CS231n Assignment 2</li>
+      <li><span class="proj">P5</span> Kaggle <a href="https://www.kaggle.com/competitions/cassava-leaf-disease-classification">Cassava Leaf</a> — timm + TTA, top 25%</li>
+      <li><span class="proj">P6</span> char-LSTM vs tiny transformer on Tiny Shakespeare</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">07</span><h2 class="title">Transformers &amp; LLMs</h2><span class="when">Weeks 13–16</span></div>
+  <p class="goal">Attention from scratch → fine-tune a 7B model. <span class="proj">P7</span> nanoGPT · <span class="proj">P8</span> QLoRA.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://jalammar.github.io/illustrated-transformer/">Illustrated Transformer</a></li>
+      <li><a href="https://www.youtube.com/watch?v=kCc8FmEb1nY">Karpathy — Let's build GPT</a> + <a href="https://www.youtube.com/watch?v=l8pRSuU81PU">GPT-2</a></li>
+      <li><a href="https://huggingface.co/learn/nlp-course/chapter1/1">HuggingFace NLP course</a></li>
+      <li>Papers: <a href="https://arxiv.org/abs/1706.03762">Attention</a> · <a href="https://arxiv.org/abs/2106.09685">LoRA</a> · <a href="https://arxiv.org/abs/2305.14314">QLoRA</a></li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li><span class="proj">P7</span> Reproduce <a href="https://github.com/karpathy/nanoGPT">nanoGPT</a> on Tiny Shakespeare → TinyStories</li>
+      <li><span class="proj">P8</span> QLoRA fine-tune Mistral-7B with <a href="https://github.com/huggingface/trl">TRL</a></li>
+      <li>Eval with <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> + serve via <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">vLLM</a></li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">08</span><h2 class="title">MLOps fundamentals</h2><span class="when">Weeks 17–18</span></div>
+  <p class="goal">Versioning, pipelines, registries, CI/CD.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops">Coursera — MLOps Specialization</a> (Andrew Ng)</li>
+      <li>Chip Huyen — <a href="https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/">Designing ML Systems</a></li>
+      <li><a href="https://github.com/DataTalksClub/mlops-zoomcamp">MLOps Zoomcamp</a> modules 1–6</li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Dockerize Project 2; add DVC + MLflow</li>
+      <li>GitHub Actions CI: lint → test → train → register</li>
+      <li>Reproduce Zoomcamp module 4 on your own model</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">09</span><h2 class="title">Deployment, monitoring &amp; security</h2><span class="when">Weeks 19–20</span></div>
+  <p class="goal">Serve, observe, defend. <span class="proj">P9</span> full-stack production deploy.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://fastapi.tiangolo.com/tutorial/">FastAPI tutorial</a> 1–10</li>
+      <li><a href="https://www.evidentlyai.com/ml-in-production">Evidently — ML in Production</a></li>
+      <li><a href="https://sre.google/sre-book/service-level-objectives/">Google SRE — SLOs</a></li>
+      <li><a href="https://owasp.org/www-project-machine-learning-security-top-10/">OWASP ML</a> + <a href="https://genai.owasp.org/llm-top-10/">LLM Top 10</a></li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Wrap Project 4 in FastAPI + Prometheus + Grafana</li>
+      <li>Add Evidently drift report</li>
+      <li><span class="proj">P9</span> Deploy P8 LLM end-to-end on AWS EKS / SageMaker</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">10</span><h2 class="title">AWS MLA-C01 cert</h2><span class="when">Week 21</span></div>
+  <p class="goal">Pass the AWS ML Engineer Associate exam.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://www.coursera.org/learn/aws-machine-learning-engineer-associate-exam-prep">Coursera — AWS MLE Associate Exam Prep</a> (Neal Davis, Coursera Plus) — primary</li>
+      <li><a href="https://explore.skillbuilder.aws/learn/learning-plans/2191/standard-exam-prep-plan-aws-certified-machine-learning-engineer-associate-mla-c01-english">AWS Skill Builder — official prep plan</a> (free, by AWS)</li>
+      <li><a href="https://www.udemy.com/course/aws-certified-machine-learning-engineer-associate-mla-c01/">Udemy — Maarek &amp; Kane MLA-C01</a> (exam-focused alt.)</li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>SageMaker Pipeline: preprocess → train → eval → register</li>
+      <li>Bedrock + Step Functions toy app</li>
+      <li><a href="https://portal.tutorialsdojo.com/courses/aws-certified-machine-learning-engineer-associate-practice-exams/">Tutorials Dojo</a> ×3 timed &gt; 80% → schedule exam</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">10b</span><h2 class="title">High-perf inference &amp; distributed</h2><span class="when">parallel, Wks 19–23</span></div>
+  <p class="goal">Low latency, high throughput, multi-GPU. The Anthropic/Nvidia layer.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://kipp.ly/transformer-inference-arithmetic/">Kipply — Inference arithmetic</a></li>
+      <li><a href="https://horace.io/brrr_intro.html">Horace He — Making DL go brrr</a></li>
+      <li><a href="https://lilianweng.github.io/posts/2023-01-10-inference-optimization/">Lilian Weng — Inference optimization</a></li>
+      <li><a href="https://efficientml.ai/">MIT 6.5940 — TinyML &amp; Efficient DL</a></li>
+      <li><a href="https://github.com/stas00/ml-engineering">stas00/ml-engineering handbook</a></li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Re-serve P8 via vLLM, benchmark p50/p99</li>
+      <li>Quantize with AWQ; compare quality vs latency</li>
+      <li>FSDP train on 2× GPUs, profile</li>
+      <li>Convert to TensorRT-LLM + serve via Triton</li>
+      <li>Publish a load-test report blog</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">11</span><h2 class="title">ML system design</h2><span class="when">Weeks 22–23</span></div>
+  <p class="goal">Whiteboard end-to-end systems in 45 min. <span class="proj">P10</span> capstone.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li>Alex Xu — <a href="https://bytebytego.com/courses/ml-system-design-interview/">ML System Design Interview</a></li>
+      <li><a href="https://github.com/eugeneyan/applied-ml">eugeneyan/applied-ml</a> — 3 case studies/wk</li>
+      <li><a href="https://github.com/chiphuyen/machine-learning-systems-design">Chip Huyen — exercises</a></li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Whiteboard 6 designs, recorded: recsys, fraud, ranking, RAG, search, fine-tune platform</li>
+      <li><span class="proj">P10</span> RAG + eval + guardrails + cost dashboard, OR merged PR to vLLM/transformers/Lightning</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">12</span><h2 class="title">Interviews, OSS &amp; writing</h2><span class="when">Weeks 24–26</span></div>
+  <p class="goal">Convert skill into offers.</p>
+  <div class="row">
+    <div class="col"><h4>Learn</h4><ol>
+      <li><a href="https://huyenchip.com/ml-interviews-book/">Chip Huyen — ML Interviews</a></li>
+      <li><a href="https://neetcode.io/roadmap">Neetcode 150</a></li>
+      <li><a href="https://magazine.sebastianraschka.com/">Raschka — Ahead of AI</a></li>
+    </ol></div>
+    <div class="col"><h4>Build</h4><ol>
+      <li>Neetcode 150 — 5/day for 4 weeks</li>
+      <li>3 blogs: paper reimpl · MLOps story · inference perf</li>
+      <li>1 merged PR to vLLM / transformers / Lightning</li>
+      <li>Apply: Anthropic, Nvidia, Meta, OpenAI, DeepMind</li>
+    </ol></div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-head"><span class="num">📄</span><h2 class="title">Weekend papers — 1/week</h2></div>
+  <p class="goal">Read in order within each group. 1-paragraph summary in <code>ml-journal</code>.</p>
+  <div class="row">
+    <div class="col"><h4>1. Transformers &amp; LLMs</h4><ol>
+      <li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></li>
+      <li><a href="https://arxiv.org/abs/1810.04805">BERT</a></li>
+      <li><a href="https://arxiv.org/abs/2005.14165">GPT-3</a></li>
+      <li><a href="https://arxiv.org/abs/2001.08361">Scaling Laws</a> · <a href="https://arxiv.org/abs/2203.15556">Chinchilla</a></li>
+      <li><a href="https://arxiv.org/abs/2310.06825">Mistral 7B</a></li>
+    </ol></div>
+    <div class="col"><h4>2. Fine-tuning &amp; alignment</h4><ol>
+      <li><a href="https://arxiv.org/abs/2106.09685">LoRA</a></li>
+      <li><a href="https://arxiv.org/abs/2305.14314">QLoRA</a></li>
+      <li><a href="https://arxiv.org/abs/2203.02155">InstructGPT</a></li>
+      <li><a href="https://arxiv.org/abs/2305.18290">DPO</a></li>
+      <li><a href="https://arxiv.org/abs/2212.08073">Constitutional AI</a></li>
+    </ol></div>
+    <div class="col"><h4>3. Reasoning &amp; agents</h4><ol>
+      <li><a href="https://arxiv.org/abs/2201.11903">Chain-of-Thought</a></li>
+      <li><a href="https://arxiv.org/abs/2210.03629">ReAct</a></li>
+      <li><a href="https://arxiv.org/abs/2305.10601">Tree of Thoughts</a></li>
+      <li><a href="https://arxiv.org/abs/2005.11401">RAG</a></li>
+    </ol></div>
+    <div class="col"><h4>4. Efficient inference</h4><ol>
+      <li><a href="https://arxiv.org/abs/2205.14135">FlashAttention</a> · <a href="https://arxiv.org/abs/2307.08691">FA-2</a></li>
+      <li><a href="https://arxiv.org/abs/2309.06180">vLLM / PagedAttention</a></li>
+      <li><a href="https://arxiv.org/abs/2210.17323">GPTQ</a> · <a href="https://arxiv.org/abs/2306.00978">AWQ</a></li>
+      <li><a href="https://arxiv.org/abs/1910.02054">ZeRO</a></li>
+      <li><a href="https://arxiv.org/abs/2211.05102">Pope — Scaling Inference</a></li>
+    </ol></div>
+    <div class="col"><h4>5. Vision &amp; multimodal</h4><ol>
+      <li><a href="https://arxiv.org/abs/1512.03385">ResNet</a></li>
+      <li><a href="https://arxiv.org/abs/2010.11929">ViT</a></li>
+      <li><a href="https://arxiv.org/abs/2103.00020">CLIP</a></li>
+      <li><a href="https://arxiv.org/abs/2112.10752">Stable Diffusion</a></li>
+    </ol></div>
+    <div class="col"><h4>6. Safety &amp; systems</h4><ol>
+      <li><a href="https://research.google/pubs/pub43146/">Hidden Technical Debt</a></li>
+      <li><a href="https://transformer-circuits.pub/2022/mech-interp-essay/index.html">Anthropic — Mech Interp</a></li>
+      <li><a href="https://arxiv.org/abs/2202.03286">Red-Teaming LMs</a></li>
+      <li><a href="https://arxiv.org/abs/2307.15043">GCG Adversarial Suffixes</a></li>
+    </ol></div>
+  </div>
+</div>
+
+</main>
+
+<footer>Build, break, write, repeat.</footer>
+
+</body>
+</html>
