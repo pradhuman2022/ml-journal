@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P9 — Production LLM on AWS · ml-journal</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header><div class="wrap"><h1>ml-journal</h1>
+<nav><a href="../index.html">Projects</a><a href="../notes.html">Notes</a><a href="../weekly.html">Weekly log</a></nav></div></header>
+
+<main class="wrap">
+  <a class="back" href="../index.html">← all projects</a>
+  <article class="detail">
+    <h2>P9 — Production LLM on AWS</h2>
+    <div class="meta">Stage 09 · Weeks 19–20 · status: not started</div>
+
+    <h3>Goal</h3>
+    <p>Take P8's fine-tuned LLM all the way to production. End-to-end stack: data, training, serving, monitoring, security, CI/CD.</p>
+
+    <h3>Deliverables</h3>
+    <ul>
+      <li>DVC for dataset + artifact versioning</li>
+      <li>MLflow tracking + model registry</li>
+      <li>FastAPI inference service in Docker</li>
+      <li>Deployed to AWS EKS or SageMaker</li>
+      <li>Prometheus + Grafana for latency / QPS / errors</li>
+      <li>Evidently drift report on incoming traffic</li>
+      <li>GitHub Actions CI/CD: lint → test → build → deploy</li>
+      <li>Architecture diagram in README</li>
+    </ul>
+
+    <h3>Stack</h3>
+    <p><code>dvc</code> · <code>mlflow</code> · <code>fastapi</code> · <code>docker</code> · <code>kubernetes</code> · <code>prometheus</code> · <code>grafana</code> · <code>evidently</code> · <code>github-actions</code> · <code>aws</code></p>
+
+    <h3>Code</h3>
+    <p><a href="https://github.com/your-username/ml-journal/tree/main/projects/p9-production">projects/p9-production</a></p>
+  </article>
+</main>
+<footer><div class="wrap">Build · break · write · repeat.</div></footer>
+</body>
+</html>

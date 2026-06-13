@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P8 — QLoRA fine-tune · ml-journal</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header><div class="wrap"><h1>ml-journal</h1>
+<nav><a href="../index.html">Projects</a><a href="../notes.html">Notes</a><a href="../weekly.html">Weekly log</a></nav></div></header>
+
+<main class="wrap">
+  <a class="back" href="../index.html">← all projects</a>
+  <article class="detail">
+    <h2>P8 — QLoRA fine-tune Mistral-7B</h2>
+    <div class="meta">Stage 07 · Weeks 15–16 · status: not started</div>
+
+    <h3>Goal</h3>
+    <p>Fine-tune a real 7B model on a single GPU. Eval rigorously. Serve fast.</p>
+
+    <h3>Deliverables</h3>
+    <ul>
+      <li>QLoRA fine-tune of Mistral-7B (or Llama-3-8B) on a domain dataset</li>
+      <li>Eval with <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> vs base model</li>
+      <li>Served via <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">vLLM</a> with measured p50/p99 latency</li>
+      <li>Adapter weights pushed to HuggingFace Hub</li>
+      <li>Blog: "Fine-tuning a 7B model on one GPU"</li>
+    </ul>
+
+    <h3>Stack</h3>
+    <p><code>transformers</code> · <code>peft</code> · <code>trl</code> · <code>bitsandbytes</code> · <code>vllm</code></p>
+
+    <h3>Code</h3>
+    <p><a href="https://github.com/your-username/ml-journal/tree/main/projects/p8-qlora">projects/p8-qlora</a></p>
+  </article>
+</main>
+<footer><div class="wrap">Build · break · write · repeat.</div></footer>
+</body>
+</html>
