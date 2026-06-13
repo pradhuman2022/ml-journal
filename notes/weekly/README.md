@@ -1,0 +1,3 @@
+# Weekly log
+
+One file per week: `week-01.md`, `week-02.md` ...
