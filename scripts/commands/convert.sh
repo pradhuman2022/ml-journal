@@ -42,8 +42,8 @@ path = sys.argv[1]
 with open(path, 'r', encoding='utf-8') as f:
     content = f.read()
 
-# Replace absolute paths (quoted or HTML-entity-quoted) with just the filename
-content = re.sub(r'(?:/[^\s\'"&#]+/)([\w.\-]+)', r'\1', content)
+# Replace local absolute paths (e.g. /Users/foo/bar/file.csv) with just the filename
+content = re.sub(r'/(?:Users|home)/[^\s\'"&#]*/([^\s\'"&#/]+)', r'\1', content)
 
 with open(path, 'w', encoding='utf-8') as f:
     f.write(content)
