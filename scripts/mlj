@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve symlink to find the real script location
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+CMD_DIR="$SCRIPT_DIR/commands"
+
+usage() {
+  echo "mlj — ml-journal CLI"
+  echo ""
+  echo "Usage: mlj <command> [args]"
+  echo ""
+  echo "Commands:"
+  echo "  new <title> [path]   Create a new scaffold notebook"
+  echo "  convert              Convert all notebooks to HTML for GitHub Pages"
+  echo "  run [path]           Launch Jupyter (file or directory)"
+  echo "  kaggle-setup         Install kaggle CLI and configure API token"
+  echo ""
+  echo "Examples:"
+  echo "  mlj new \"Week 1 - Titanic EDA\""
+  echo "  mlj new \"CIFAR-10\" projects/p4-cifar10/notebook"
+  echo "  mlj convert"
+  echo "  mlj run"
+  echo "  mlj run notes/week-1-titanic-eda.ipynb"
+  echo "  mlj kaggle-setup"
+  exit 1
+}
+
+[[ $# -lt 1 ]] && usage
+
+CMD="$1"
+shift
+
+case "$CMD" in
+  new)          bash "$CMD_DIR/new.sh" "$@" ;;
+  convert)      bash "$CMD_DIR/convert.sh" "$@" ;;
+  run)          bash "$CMD_DIR/run.sh" "$@" ;;
+  kaggle-setup) bash "$CMD_DIR/kaggle_setup.sh" "$@" ;;
+  help|--help|-h) usage ;;
+  *) echo "Unknown command: $CMD"; echo ""; usage ;;
+esac
