@@ -8,17 +8,48 @@ NOTES_HTML="$REPO_ROOT/docs/notes.html"
 
 mkdir -p "$OUT_DIR"
 
-notebooks=$(find "$NOTES_DIR" -name "*.ipynb" | sort)
+# Remove stale checkpoint HTMLs
+find "$OUT_DIR" -name "*-checkpoint.html" -delete
+
+# Remove HTMLs with no matching source notebook
+for html in "$OUT_DIR"/*.html; do
+  [[ -f "$html" ]] || continue
+  name="$(basename "$html" .html)"
+  if ! find "$NOTES_DIR" -name "${name}.ipynb" -not -path "*/.ipynb_checkpoints/*" | grep -q .; then
+    echo "Removing stale: $html"
+    rm "$html"
+  fi
+done
+
+notebooks=$(find "$NOTES_DIR" -name "*.ipynb" -not -path "*/.ipynb_checkpoints/*" | sort)
 
 if [[ -z "$notebooks" ]]; then
   echo "No notebooks found in $NOTES_DIR"
   exit 0
 fi
 
-# Convert each notebook to HTML
+# Convert each notebook and strip absolute paths from the HTML
 echo "$notebooks" | while read -r nb; do
   echo "Converting: $nb"
   jupyter nbconvert --to html "$nb" --output-dir "$OUT_DIR"
+
+  html_out="$OUT_DIR/$(basename "$nb" .ipynb).html"
+
+  python3 - "$html_out" <<'PYEOF'
+import re, sys
+
+path = sys.argv[1]
+with open(path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Replace absolute paths (quoted or HTML-entity-quoted) with just the filename
+content = re.sub(r'(?:/[^\s\'"&#]+/)([\w.\-]+)', r'\1', content)
+
+with open(path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"  Redacted paths in: {path}")
+PYEOF
 done
 
 # Generate cards for notes.html
@@ -27,10 +58,9 @@ cards=""
 i=0
 
 while IFS= read -r nb; do
-  # Extract title from first markdown cell
   title=$(python3 -c "
-import json, sys
-nb = json.load(open('$nb'))
+import json
+nb = json.load(open('$nb'.replace(\"'\", \"'\\\"'\\\"'\")))
 for cell in nb['cells']:
     if cell['cell_type'] == 'markdown':
         src = ''.join(cell['source'])
