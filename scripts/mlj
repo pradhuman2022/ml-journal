@@ -21,6 +21,7 @@ usage() {
   echo "  convert              Convert all notebooks to HTML for GitHub Pages"
   echo "  run [path]           Launch Jupyter (file or directory)"
   echo "  kaggle-setup         Install kaggle CLI and configure API token"
+  echo "  data <id>            Download Kaggle dataset or competition into notes/data/"
   echo ""
   echo "Examples:"
   echo "  mlj new \"Week 1 - Titanic EDA\""
@@ -42,6 +43,7 @@ case "$CMD" in
   convert)      bash "$CMD_DIR/convert.sh" "$@" ;;
   run)          bash "$CMD_DIR/run.sh" "$@" ;;
   kaggle-setup) bash "$CMD_DIR/kaggle_setup.sh" "$@" ;;
+  data)         bash "$CMD_DIR/data.sh" "$@" ;;
   help|--help|-h) usage ;;
   *) echo "Unknown command: $CMD"; echo ""; usage ;;
 esac
