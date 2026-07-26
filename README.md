@@ -1,6 +1,6 @@
 # ml-journal
 
-Public log of my journey from Senior MTS to ML / MLOps engineer — projects, paper notes, weekly progress.
+Public log of my journey into ML / MLOps engineering — projects, paper notes, weekly progress.
 
 **Live site:** https://&lt;pradhuman2022&gt;.github.io/ml-journal/
 
