@@ -11,10 +11,14 @@ mkdir -p "$OUT_DIR"
 # Remove stale checkpoint HTMLs
 find "$OUT_DIR" -name "*-checkpoint.html" -delete
 
+# Hand-authored interactive pages (no source notebook) — never delete these
+KEEP_HTML=(optimizer-playground relu-boundary-lab)
+
 # Remove HTMLs with no matching source notebook
 for html in "$OUT_DIR"/*.html; do
   [[ -f "$html" ]] || continue
   name="$(basename "$html" .html)"
+  [[ " ${KEEP_HTML[*]} " == *" $name "* ]] && continue
   if ! find "$NOTES_DIR" -name "${name}.ipynb" -not -path "*/.ipynb_checkpoints/*" | grep -q .; then
     echo "Removing stale: $html"
     rm "$html"
