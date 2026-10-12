@@ -1,0 +1,452 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ReLU Boundary Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: instrument bench — controls rail on the left, the input-space plot as the main readout, layer rows below it like a stack of scopes. */
+:root{
+  --bg:#eef0f5; --panel:#ffffff; --fg:#151923; --muted:#5b6274; --line:#d7dbe5; --soft:#f5f6fa;
+  --accent:#4a3ed0; --neg:#d68a1a;
+  --clsA:#2463c8; --clsB:#d1502b; --clsC:#1d9365;
+  --font-ui:"Familjen Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1117; --panel:#161a23; --fg:#e6e8ee; --muted:#99a0b1; --line:#2a3040; --soft:#1c2130;
+  --accent:#9389ff; --neg:#f0a640; --clsA:#5c94f2; --clsB:#f27b57; --clsC:#3fc58e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1117; --panel:#161a23; --fg:#e6e8ee; --muted:#99a0b1; --line:#2a3040; --soft:#1c2130;
+  --accent:#9389ff; --neg:#f0a640; --clsA:#5c94f2; --clsB:#f27b57; --clsC:#3fc58e; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.45}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:20px;padding-block:20px 40px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:0;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:68ch}
+.arch{font-family:var(--font-mono);font-size:12.5px;color:var(--muted)}
+.arch b{color:var(--fg);font-weight:500}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;align-items:start}
+.rail{display:flex;flex-direction:column;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.group{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;display:flex;justify-content:space-between}
+.lbl output{font-family:var(--font-mono);text-transform:none;letter-spacing:0;color:var(--fg);font-weight:400}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.seg button,.btn{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--soft);color:var(--fg);border-radius:7px;padding:7px 8px;cursor:pointer;text-align:left}
+.seg button small{display:block;color:var(--muted);font-size:11px;font-family:var(--font-mono)}
+.seg button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--panel)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+select{font:inherit;padding:6px 8px;border-radius:7px;border:1px solid var(--line);background:var(--soft);color:var(--fg)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn{text-align:center;font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--panel);grid-column:1/-1}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-variant-numeric:tabular-nums}
+.stat{background:var(--soft);border-radius:7px;padding:7px 8px}
+.stat span{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.stat b{font-family:var(--font-mono);font-weight:500;font-size:14px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer}
+.chk input{accent-color:var(--accent)}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,330px);gap:18px;align-items:start;min-width:0}
+.plotbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.plothead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.plothead h2,.side h2,.layers h2{font-size:15px;margin:0;font-weight:600}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend .ln{width:16px;height:0;border-radius:0;border-top:2.5px solid var(--fg);vertical-align:3px}
+.legend .dl{width:16px;height:0;border-radius:0;border-top:1.5px dashed var(--muted);vertical-align:3px}
+#main{width:100%;aspect-ratio:1;max-width:100%;display:block;border-radius:6px}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.eq{font-family:var(--font-mono);font-size:12.5px;line-height:1.7;overflow-x:auto;white-space:nowrap;padding-bottom:2px}
+.eq .k{color:var(--muted)}
+.eq .pos{color:var(--accent)} .eq .ng{color:var(--neg)}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+#net{width:100%;height:170px;display:block}
+.layers{display:flex;flex-direction:column;gap:12px}
+.lrow{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:grid;grid-template-columns:170px minmax(0,1fr);gap:14px;align-items:start}
+.lmeta{display:flex;flex-direction:column;gap:6px}
+.lmeta h3{margin:0;font-size:14px;font-weight:600}
+.lmeta p{margin:0;font-size:12px;color:var(--muted)}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:7px;overflow:hidden;width:max-content}
+.stepper button{font:inherit;border:0;background:var(--soft);color:var(--fg);width:30px;height:28px;cursor:pointer;font-size:16px}
+.stepper button:disabled{color:var(--line);cursor:default}
+.stepper output{font-family:var(--font-mono);min-width:64px;text-align:center;font-size:12.5px}
+.cells{display:flex;flex-wrap:wrap;gap:10px;min-width:0}
+.neuron{font:inherit;color:inherit;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:6px;cursor:pointer;display:flex;flex-direction:column;gap:4px;width:126px}
+.neuron[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.neuron canvas{width:112px;height:112px;display:block;border-radius:4px}
+.ncap{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.chip{width:max-content;font-size:10.5px;padding:1px 6px;border-radius:99px;background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+.chip.dead{color:var(--neg);border-color:var(--neg)}
+@media (max-width:980px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.app{grid-template-columns:minmax(0,1fr)}.lrow{grid-template-columns:minmax(0,1fr)}.neuron{width:104px}.neuron canvas{width:90px;height:90px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>ReLU Boundary Lab</h1>
+      <p>A 2-input network with three ReLU hidden layers and one linear layer that outputs K logits followed by a softmax. Every neuron is drawn over the same input square (x, y). The black line in each panel shows where that neuron switches on.</p>
+    </div>
+    <div class="arch" id="arch"></div>
+  </header>
+
+  <div class="app">
+    <aside class="rail" aria-label="Controls">
+      <div class="group">
+        <div class="lbl">Dataset</div>
+        <div class="seg" id="datasets"></div>
+      </div>
+      <div class="group">
+        <label class="lbl" for="noise">Noise <output id="noiseOut"></output></label>
+        <input type="range" id="noise" min="0" max="0.5" step="0.01" value="0.12">
+      </div>
+      <div class="group">
+        <label class="lbl" for="lr">Learning rate (Adam)</label>
+        <select id="lr"><option>0.003</option><option>0.01</option><option selected>0.03</option><option>0.1</option></select>
+      </div>
+      <div class="group">
+        <div class="btns">
+          <button class="btn primary" id="play">Pause</button>
+          <button class="btn" id="step">Step ×25</button>
+          <button class="btn" id="reinit">Re-initialize</button>
+        </div>
+      </div>
+      <div class="stats" aria-live="polite">
+        <div class="stat"><span>Epoch</span><b id="sEpoch">0</b></div>
+        <div class="stat"><span>Loss</span><b id="sLoss">–</b></div>
+        <div class="stat"><span>Acc</span><b id="sAcc">–</b></div>
+      </div>
+      <div class="group">
+        <div class="lbl">Overlays on main plot</div>
+        <label class="chk"><input type="checkbox" id="optFolds" checked> Layer-1 fold lines</label>
+        <label class="chk"><input type="checkbox" id="optSel" checked> Selected neuron's zero line</label>
+        <label class="chk"><input type="checkbox" id="optPts" checked> Data on neuron panels</label>
+      </div>
+      <p class="note">Each training step is one full batch of 200 points with softmax cross-entropy. If a neuron goes dead (zero on the whole square), click Re-initialize.</p>
+    </aside>
+
+    <div class="stage">
+      <section class="plotbox" aria-label="Decision regions">
+        <div class="plothead">
+          <h2>Decision boundary in input space</h2>
+          <div class="legend" id="legend"></div>
+        </div>
+        <canvas id="main" aria-label="Input space showing class regions, decision boundary and training points"></canvas>
+      </section>
+
+      <div class="side">
+        <section class="card">
+          <h2>Linear layer: logits and boundary</h2>
+          <div class="eq" id="outEq"></div>
+          <div class="eq" id="bndEq"></div>
+          <p class="note">In c-space (the outputs of hidden layer 3) the boundary is a flat hyperplane. Each c is a piecewise-linear function of (x, y), so the same boundary drawn in input space is a polyline that bends.</p>
+        </section>
+        <section class="card">
+          <h2 id="selTitle">Selected neuron</h2>
+          <div class="eq" id="selEq"></div>
+          <p class="note" id="selNote"></p>
+        </section>
+        <section class="card">
+          <h2>Weights</h2>
+          <canvas id="net" aria-label="Network diagram, edge width is weight magnitude"></canvas>
+          <div class="legend"><span><i style="background:var(--accent)"></i>positive</span><span><i style="background:var(--neg)"></i>negative</span><span>width = |w|</span></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <section class="layers" id="layers" aria-label="Layer activations"></section>
+</div>
+
+<script>
+(()=>{
+const R=3, G=84, N_PER=100;
+const LNAME=['a','b','c','z'], CLS=['A','B','C'];
+const DATASETS=[
+  {id:'moons',name:'Moons',K:2},{id:'xor',name:'XOR',K:2},
+  {id:'circles',name:'Circles',K:2},{id:'spiral',name:'Spiral',K:3},
+  {id:'blobs',name:'Blobs',K:3}];
+const S={data:'moons',noise:0.12,widths:[3,3,3],lr:0.03,running:true,epoch:0,loss:NaN,acc:NaN,
+  sel:{l:0,n:0},folds:true,showSel:true,pts:true,seed:7};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduce) S.running=false;
+
+/* ---------- RNG ---------- */
+let rs=1;
+const rnd=()=>{rs=(rs*1664525+1013904223)>>>0;return rs/4294967296};
+const gauss=()=>{let u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+
+/* ---------- Data ---------- */
+let X=[],Y=[],K=2;
+function makeData(){
+  rs=12345; X=[];Y=[];
+  const d=DATASETS.find(d=>d.id===S.data); K=d.K; const nz=S.noise;
+  const push=(x,y,c)=>{X.push([x+gauss()*nz*1.4,y+gauss()*nz*1.4]);Y.push(c)};
+  if(d.id==='moons'){for(let i=0;i<N_PER;i++){const t=Math.PI*rnd();
+    push((Math.cos(t)-0.5)*1.7,(Math.sin(t)-0.25)*1.7,0);
+    push((1-Math.cos(t)-0.5)*1.7,(0.5-Math.sin(t)-0.25)*1.7,1);}}
+  if(d.id==='xor'){for(let i=0;i<2*N_PER;i++){let x=(rnd()*2-1)*2.5,y=(rnd()*2-1)*2.5;
+    x+=Math.sign(x)*0.2;y+=Math.sign(y)*0.2;push(x,y,x*y>0?0:1);}}
+  if(d.id==='circles'){for(let i=0;i<N_PER;i++){const a=rnd()*6.283,r=rnd()*1.1;push(r*Math.cos(a),r*Math.sin(a),0);
+    const b=rnd()*6.283,q=1.8+rnd()*0.7;push(q*Math.cos(b),q*Math.sin(b),1);}}
+  if(d.id==='spiral'){const n=Math.round(2*N_PER/3);for(let k=0;k<3;k++)for(let i=0;i<n;i++){const t=i/n;
+    const ang=t*4.2+k*2*Math.PI/3,r=0.2+t*2.5;push(r*Math.cos(ang),r*Math.sin(ang),k);}}
+  if(d.id==='blobs'){const n=Math.round(2*N_PER/3);const C=[[-1.4,1.1],[1.5,0.9],[0,-1.6]];
+    for(let k=0;k<3;k++)for(let i=0;i<n;i++)push(C[k][0]+gauss()*0.55,C[k][1]+gauss()*0.55,k);}
+}
+
+/* ---------- Network ---------- */
+let net=null;
+function sizes(){return [2,...S.widths,K]}
+function initNet(){
+  rs=S.seed*7919+S.widths.join('').length*31+K;
+  const sz=sizes(); const W=[],b=[],mW=[],vW=[],mb=[],vb=[];
+  for(let l=0;l<4;l++){const nin=sz[l],nout=sz[l+1];
+    const w=new Float64Array(nin*nout),bb=new Float64Array(nout);
+    const sd=Math.sqrt(2/nin);
+    for(let i=0;i<w.length;i++)w[i]=gauss()*sd;
+    for(let i=0;i<nout;i++)bb[i]=l<3?(rnd()-0.5)*0.8:0;
+    W.push(w);b.push(bb);mW.push(new Float64Array(w.length));vW.push(new Float64Array(w.length));
+    mb.push(new Float64Array(nout));vb.push(new Float64Array(nout));}
+  net={sz,W,b,mW,vW,mb,vb,t:0};S.epoch=0;S.loss=NaN;S.acc=NaN;
+  if(S.sel.l>3||S.sel.n>=sz[S.sel.l+1])S.sel={l:0,n:0};
+}
+function forward(x,y,pre,act){
+  const {sz,W,b}=net; let inp=[x,y];
+  for(let l=0;l<4;l++){const nin=sz[l],nout=sz[l+1],w=W[l],z=pre[l],a=act[l];
+    for(let o=0;o<nout;o++){let s=b[l][o];for(let i=0;i<nin;i++)s+=w[o*nin+i]*inp[i];z[o]=s;a[o]=l<3?(s>0?s:0):s;}
+    inp=a;}
+}
+function bufs(){const sz=net.sz;return{pre:[1,2,3,4].map(l=>new Float64Array(sz[l])),act:[1,2,3,4].map(l=>new Float64Array(sz[l]))}}
+function trainStep(){
+  const {sz,W,b}=net;const B=bufs();
+  const gW=W.map(w=>new Float64Array(w.length)),gb=b.map(v=>new Float64Array(v.length));
+  const dl=[1,2,3,4].map(l=>new Float64Array(sz[l]));
+  let loss=0,correct=0;const n=X.length;
+  for(let s=0;s<n;s++){
+    const [x,y]=X[s];forward(x,y,B.pre,B.act);
+    const z=B.act[3];let m=-1e9;for(let k=0;k<K;k++)m=Math.max(m,z[k]);
+    let se=0;const p=new Float64Array(K);for(let k=0;k<K;k++){p[k]=Math.exp(z[k]-m);se+=p[k];}
+    let am=0;for(let k=0;k<K;k++){p[k]/=se;if(p[k]>p[am])am=k;}
+    if(am===Y[s])correct++;loss-=Math.log(Math.max(p[Y[s]],1e-12));
+    for(let k=0;k<K;k++)dl[3][k]=p[k]-(k===Y[s]?1:0);
+    for(let l=3;l>=0;l--){const nin=sz[l],nout=sz[l+1];const inp=l===0?[x,y]:B.act[l-1];
+      for(let o=0;o<nout;o++){const d=dl[l][o];if(!d)continue;gb[l][o]+=d;
+        for(let i=0;i<nin;i++)gW[l][o*nin+i]+=d*inp[i];}
+      if(l>0){const dp=dl[l-1];for(let i=0;i<nin;i++){let s2=0;for(let o=0;o<nout;o++)s2+=W[l][o*nin+i]*dl[l][o];
+        dp[i]=B.pre[l-1][i]>0?s2:0;}}
+    }
+  }
+  net.t++;const b1=0.9,b2=0.999,lr=S.lr,c1=1-Math.pow(b1,net.t),c2=1-Math.pow(b2,net.t);
+  const upd=(P,Gr,M,V)=>{for(let i=0;i<P.length;i++){const g=Gr[i]/n;M[i]=b1*M[i]+(1-b1)*g;V[i]=b2*V[i]+(1-b2)*g*g;
+    P[i]-=lr*(M[i]/c1)/(Math.sqrt(V[i]/c2)+1e-8);}};
+  for(let l=0;l<4;l++){upd(W[l],gW[l],net.mW[l],net.vW[l]);upd(b[l],gb[l],net.mb[l],net.vb[l]);}
+  S.epoch++;S.loss=loss/n;S.acc=correct/n;
+}
+
+/* ---------- Grid evaluation ---------- */
+let grid=null;
+function evalGrid(){
+  const sz=net.sz;const pre=[1,2,3,4].map(l=>Array.from({length:sz[l]},()=>new Float32Array(G*G)));
+  const prob=Array.from({length:K},()=>new Float32Array(G*G)),arg=new Uint8Array(G*G);
+  const B=bufs();
+  for(let j=0;j<G;j++){const y=R-2*R*j/(G-1);for(let i=0;i<G;i++){const x=-R+2*R*i/(G-1),p=j*G+i;
+    forward(x,y,B.pre,B.act);
+    for(let l=0;l<4;l++)for(let o=0;o<sz[l+1];o++)pre[l][o][p]=B.pre[l][o];
+    const z=B.act[3];let m=-1e9;for(let k=0;k<K;k++)m=Math.max(m,z[k]);let se=0;
+    for(let k=0;k<K;k++)se+=Math.exp(z[k]-m);let am=0;
+    for(let k=0;k<K;k++){prob[k][p]=Math.exp(z[k]-m)/se;if(z[k]>z[am])am=k;}arg[p]=am;}}
+  grid={pre,prob,arg};
+}
+
+/* ---------- Colors ---------- */
+let C={};
+function hex(h){h=h.trim();if(h.startsWith('#')){if(h.length===4)h='#'+[...h.slice(1)].map(c=>c+c).join('');
+  return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+  const m=h.match(/\d+/g);return m?m.slice(0,3).map(Number):[0,0,0];}
+function readColors(){const cs=getComputedStyle(document.documentElement);
+  for(const k of['bg','panel','fg','muted','line','soft','accent','neg','clsA','clsB','clsC'])C[k]=hex(cs.getPropertyValue('--'+k));
+  C.cls=[C.clsA,C.clsB,C.clsC];}
+const rgb=(c,a=1)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+
+/* ---------- Drawing helpers ---------- */
+const off=document.createElement('canvas');off.width=G;off.height=G;const offx=off.getContext('2d');
+const img=offx.createImageData(G,G);
+function fit(cv){const dpr=Math.min(devicePixelRatio||1,2);const w=cv.clientWidth,h=cv.clientHeight;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return{ctx,w,h};}
+function paint(ctx,w,h,colorAt){const d=img.data;
+  for(let p=0;p<G*G;p++){const c=colorAt(p);d[p*4]=c[0];d[p*4+1]=c[1];d[p*4+2]=c[2];d[p*4+3]=255;}
+  offx.putImageData(img,0,0);ctx.imageSmoothingEnabled=true;ctx.drawImage(off,0,0,G,G,0,0,w,h);}
+function contour(ctx,w,h,f,keep){
+  const sx=w/(G-1),sy=h/(G-1);ctx.beginPath();
+  for(let j=0;j<G-1;j++)for(let i=0;i<G-1;i++){
+    const a=f(j*G+i),b=f(j*G+i+1),c=f((j+1)*G+i+1),d=f((j+1)*G+i);
+    const sa=a>0,sb=b>0,sc=c>0,sd=d>0;if(sa===sb&&sb===sc&&sc===sd)continue;
+    if(keep&&!keep(i,j))continue;
+    const pts=[];
+    if(sa!==sb){const t=a/(a-b);pts.push([(i+t)*sx,j*sy]);}
+    if(sb!==sc){const t=b/(b-c);pts.push([(i+1)*sx,(j+t)*sy]);}
+    if(sd!==sc){const t=d/(d-c);pts.push([(i+t)*sx,(j+1)*sy]);}
+    if(sa!==sd){const t=a/(a-d);pts.push([i*sx,(j+t)*sy]);}
+    for(let k=0;k+1<pts.length;k+=2){ctx.moveTo(pts[k][0],pts[k][1]);ctx.lineTo(pts[k+1][0],pts[k+1][1]);}
+  }ctx.stroke();}
+const toPx=(x,y,w,h)=>[(x+R)/(2*R)*w,(R-y)/(2*R)*h];
+
+/* ---------- Main plot ---------- */
+const mainCv=document.getElementById('main');
+function drawMain(){
+  const {ctx,w,h}=fit(mainCv);
+  paint(ctx,w,h,p=>{let c=[0,0,0],mx=0;for(let k=0;k<K;k++){const q=grid.prob[k][p];c[0]+=q*C.cls[k][0];c[1]+=q*C.cls[k][1];c[2]+=q*C.cls[k][2];mx=Math.max(mx,q);}
+    const conf=(mx-1/K)/(1-1/K);return mix(C.panel,c,0.14+0.34*conf);});
+  // grid lines
+  ctx.lineWidth=1;ctx.strokeStyle=rgb(C.fg,0.08);ctx.beginPath();
+  for(let v=-R+1;v<R;v++){const [px]=toPx(v,0,w,h),[,py]=toPx(0,v,w,h);ctx.moveTo(px,0);ctx.lineTo(px,h);ctx.moveTo(0,py);ctx.lineTo(w,py);}ctx.stroke();
+  ctx.strokeStyle=rgb(C.fg,0.22);ctx.beginPath();const [ox,oy]=toPx(0,0,w,h);ctx.moveTo(ox,0);ctx.lineTo(ox,h);ctx.moveTo(0,oy);ctx.lineTo(w,oy);ctx.stroke();
+  ctx.fillStyle=rgb(C.muted,0.9);ctx.font='11px "IBM Plex Mono", monospace';ctx.textBaseline='top';
+  for(let v=-R+1;v<R;v++){if(!v)continue;const [px]=toPx(v,0,w,h),[,py]=toPx(0,v,w,h);ctx.fillText(v,px+3,oy+3);ctx.fillText(v,ox+4,py+2);}
+  ctx.fillText('x',w-12,oy+3);ctx.fillText('y',ox+4,4);
+  // layer-1 folds
+  if(S.folds){ctx.setLineDash([5,4]);ctx.lineWidth=1.2;ctx.strokeStyle=rgb(C.muted,0.7);
+    for(const f of grid.pre[0])contour(ctx,w,h,p=>f[p]);ctx.setLineDash([]);}
+  // selected
+  if(S.showSel&&S.sel.l<3){ctx.setLineDash([2,4]);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.strokeStyle=rgb(C.accent,1);
+    const f=grid.pre[S.sel.l][S.sel.n];contour(ctx,w,h,p=>f[p]);ctx.setLineDash([]);ctx.lineCap='butt';}
+  // decision boundary: pairwise where the pair holds argmax on the cell
+  ctx.lineWidth=2.8;ctx.strokeStyle=rgb(C.fg,1);ctx.lineJoin='round';
+  const Z=grid.pre[3],A=grid.arg;
+  for(let a=0;a<K;a++)for(let b=a+1;b<K;b++){
+    contour(ctx,w,h,p=>Z[a][p]-Z[b][p],K===2?null:(i,j)=>{const s=[A[j*G+i],A[j*G+i+1],A[(j+1)*G+i],A[(j+1)*G+i+1]];return s.includes(a)&&s.includes(b);});}
+  // points
+  for(let s=0;s<X.length;s++){const [px,py]=toPx(X[s][0],X[s][1],w,h);if(px<-5||px>w+5||py<-5||py>h+5)continue;
+    ctx.beginPath();ctx.arc(px,py,3.6,0,7);ctx.fillStyle=rgb(C.cls[Y[s]]);ctx.fill();ctx.lineWidth=1.2;ctx.strokeStyle=rgb(C.panel);ctx.stroke();}
+}
+
+/* ---------- Layer rows ---------- */
+const layersEl=document.getElementById('layers');
+const sub=n=>String(n).split('').map(c=>'₀₁₂₃₄₅₆₇₈₉'[+c]).join('');
+function nName(l,n){return l<3?LNAME[l]+sub(n+1):'z'+'_'+CLS[n]}
+function nLabel(l,n){return l<3?LNAME[l]+sub(n+1):'z'+CLS[n]}
+function buildLayers(){
+  layersEl.innerHTML='<h2>Layer activations over input space</h2>';
+  const titles=['Hidden layer 1','Hidden layer 2','Hidden layer 3','Linear layer (logits)'];
+  const desc=['ReLU(w·[x,y]+b). Each neuron is a ramp with one straight fold line.','ReLU of a mix of layer 1. Its zero line bends wherever it crosses a layer-1 fold.','ReLU of a mix of layer 2. More pieces and more bends.','z = W·c + b, no ReLU. Orange is negative and the class color is positive. Black lines show z = 0.'];
+  for(let l=0;l<4;l++){
+    const row=document.createElement('div');row.className='lrow';
+    const n=net.sz[l+1];
+    row.innerHTML=`<div class="lmeta"><h3>${titles[l]}</h3>${l<3?`<div class="stepper"><button aria-label="Remove neuron" data-dec="${l}" ${n<=1?'disabled':''}>−</button><output>${n} neuron${n>1?'s':''}</output><button aria-label="Add neuron" data-inc="${l}" ${n>=6?'disabled':''}>+</button></div>`:`<span class="chip">${K} classes · softmax</span>`}<p>${desc[l]}</p></div><div class="cells"></div>`;
+    const cells=row.querySelector('.cells');
+    for(let o=0;o<n;o++){const b=document.createElement('button');b.className='neuron';b.dataset.l=l;b.dataset.n=o;
+      b.innerHTML=`<canvas></canvas><div class="ncap"><span>${nLabel(l,o)}</span><span class="chip" data-chip></span></div>`;cells.appendChild(b);}
+    layersEl.appendChild(row);
+  }
+  markSel();
+}
+function markSel(){layersEl.querySelectorAll('.neuron').forEach(b=>b.setAttribute('aria-pressed',(+b.dataset.l===S.sel.l&&+b.dataset.n===S.sel.n)?'true':'false'));}
+function drawLayers(){
+  layersEl.querySelectorAll('.neuron').forEach(btn=>{
+    const l=+btn.dataset.l,o=+btn.dataset.n,f=grid.pre[l][o];const cv=btn.querySelector('canvas');const {ctx,w,h}=fit(cv);
+    let mx=0,mn=0;for(let p=0;p<G*G;p++){if(f[p]>mx)mx=f[p];if(f[p]<mn)mn=f[p];}
+    const chip=btn.querySelector('[data-chip]');
+    if(l<3){const m=mx||1;paint(ctx,w,h,p=>f[p]>0?mix(C.panel,C.accent,0.12+0.78*Math.pow(f[p]/m,0.85)):mix(C.panel,C.fg,0.04));
+      chip.textContent=mx<=0?'dead':'max '+mx.toFixed(1);chip.className='chip'+(mx<=0?' dead':'');}
+    else{const m=Math.max(mx,-mn)||1;paint(ctx,w,h,p=>f[p]>0?mix(C.panel,C.cls[o],0.1+0.75*f[p]/m):mix(C.panel,C.neg,0.1+0.6*(-f[p])/m));
+      chip.textContent='±'+m.toFixed(1);chip.className='chip';}
+    if(S.pts){for(let s=0;s<X.length;s++){const [px,py]=toPx(X[s][0],X[s][1],w,h);ctx.fillStyle=rgb(C.cls[Y[s]],0.5);ctx.fillRect(px-1,py-1,2,2);}}
+    ctx.lineWidth=1.6;ctx.strokeStyle=rgb(C.fg,0.95);contour(ctx,w,h,p=>f[p]);
+  });
+}
+
+/* ---------- Equations ---------- */
+function term(w,name,first){const s=w<0?'−':(first?'':'+');const cls=w<0?'ng':'pos';return `<span class="${cls}">${first&&w>=0?'':s+' '}${Math.abs(w).toFixed(2)}</span>·${name} `;}
+function eqFor(l,o){
+  const nin=net.sz[l],w=net.W[l],b=net.b[l][o];
+  const ins=l===0?['x','y']:Array.from({length:nin},(_,i)=>nLabel(l-1,i));
+  let s='';ins.forEach((nm,i)=>s+=term(w[o*nin+i],nm,i===0));
+  s+=(b<0?'− ':'+ ')+Math.abs(b).toFixed(2);
+  return l<3?`${nLabel(l,o)} = ReLU( ${s})`:`${nLabel(l,o)} = ${s}`;
+}
+function drawEqs(){
+  let out='';for(let k=0;k<K;k++)out+=eqFor(3,k)+'<br>';document.getElementById('outEq').innerHTML=out;
+  const nin=net.sz[3],W=net.W[3],B=net.b[3];let bd='<span class="k">Decision boundary</span><br>';
+  for(let a=0;a<K;a++)for(let b=a+1;b<K;b++){let s='';for(let i=0;i<nin;i++)s+=term(W[a*nin+i]-W[b*nin+i],nLabel(2,i),i===0);
+    const bb=B[a]-B[b];s+=(bb<0?'− ':'+ ')+Math.abs(bb).toFixed(2);bd+=`z${CLS[a]} − z${CLS[b]} = ${s} = 0<br>`;}
+  document.getElementById('bndEq').innerHTML=bd;
+  const {l,n}=S.sel;const f=grid.pre[l][n];let on=0;for(let p=0;p<G*G;p++)if(f[p]>0)on++;
+  document.getElementById('selTitle').textContent=`Selected neuron ${l<3?nLabel(l,n)+' · hidden layer '+(l+1):nLabel(l,n)+' · logit'}`;
+  document.getElementById('selEq').innerHTML=eqFor(l,n);
+  document.getElementById('selNote').textContent=l<3?`Active on ${(100*on/(G*G)).toFixed(0)}% of the square [−3, 3]². ${l===0?'Its zero set is one straight line.':'Its zero set is piecewise-linear and bends where earlier neurons switch on or off.'} Click any panel below to inspect it.`:`Positive on ${(100*on/(G*G)).toFixed(0)}% of the square. Class ${CLS[n]} wins wherever this is the largest logit.`;
+}
+
+/* ---------- Network diagram ---------- */
+const netCv=document.getElementById('net');
+function drawNet(){
+  const {ctx,w,h}=fit(netCv);ctx.clearRect(0,0,w,h);const sz=net.sz,L=sz.length;
+  const pos=sz.map((n,l)=>Array.from({length:n},(_,i)=>[14+(w-28)*l/(L-1),h/2+(i-(n-1)/2)*Math.min(26,(h-24)/Math.max(n-1,1))]));
+  let mx=1e-6;for(const W of net.W)for(const v of W)mx=Math.max(mx,Math.abs(v));
+  for(let l=0;l<L-1;l++){const nin=sz[l];for(let o=0;o<sz[l+1];o++)for(let i=0;i<nin;i++){const v=net.W[l][o*nin+i];
+    ctx.strokeStyle=rgb(v>0?C.accent:C.neg,0.25+0.6*Math.abs(v)/mx);ctx.lineWidth=0.4+3*Math.abs(v)/mx;
+    ctx.beginPath();ctx.moveTo(...pos[l][i]);ctx.lineTo(...pos[l+1][o]);ctx.stroke();}}
+  ctx.font='10px "IBM Plex Mono", monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  pos.forEach((col,l)=>col.forEach(([x,y],i)=>{const sel=l>0&&S.sel.l===l-1&&S.sel.n===i;
+    ctx.beginPath();ctx.arc(x,y,sel?7:5.5,0,7);ctx.fillStyle=rgb(l===L-1?C.cls[i]:C.panel);ctx.fill();
+    ctx.lineWidth=sel?2.5:1.2;ctx.strokeStyle=rgb(sel?C.accent:C.fg,sel?1:0.6);ctx.stroke();
+    if(l===0){ctx.fillStyle=rgb(C.muted);ctx.fillText(i?'y':'x',x,y-13);}}));
+}
+
+/* ---------- Render / UI ---------- */
+function stats(){document.getElementById('sEpoch').textContent=S.epoch;
+  document.getElementById('sLoss').textContent=isNaN(S.loss)?'–':S.loss.toFixed(3);
+  document.getElementById('sAcc').textContent=isNaN(S.acc)?'–':(100*S.acc).toFixed(0)+'%';
+  document.getElementById('arch').innerHTML=`<b>2</b> → ReLU <b>${S.widths[0]}</b> → ReLU <b>${S.widths[1]}</b> → ReLU <b>${S.widths[2]}</b> → Linear <b>${K}</b> → softmax`;}
+function render(){evalGrid();drawMain();drawLayers();drawEqs();drawNet();stats();}
+function legend(){document.getElementById('legend').innerHTML=Array.from({length:K},(_,k)=>`<span><i style="background:var(--cls${CLS[k]})"></i>Class ${CLS[k]}</span>`).join('')+
+  '<span><i class="ln"></i>boundary</span><span><i class="dl"></i>layer-1 folds</span>';}
+function rebuild(){makeData();initNet();legend();buildLayers();for(let i=0;i<120;i++)trainStep();render();}
+
+const dsEl=document.getElementById('datasets');
+DATASETS.forEach(d=>{const b=document.createElement('button');b.dataset.id=d.id;b.innerHTML=`${d.name}<small>K = ${d.K}</small>`;
+  b.onclick=()=>{S.data=d.id;markDs();rebuild();};dsEl.appendChild(b);});
+function markDs(){dsEl.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===S.data?'true':'false'));}
+const noise=document.getElementById('noise'),noiseOut=document.getElementById('noiseOut');
+noise.oninput=()=>{S.noise=+noise.value;noiseOut.textContent=S.noise.toFixed(2);makeData();render();};
+document.getElementById('lr').onchange=e=>S.lr=+e.target.value;
+const play=document.getElementById('play');
+const setPlay=()=>play.textContent=S.running?'Pause':'Train';
+play.onclick=()=>{S.running=!S.running;setPlay();};
+document.getElementById('step').onclick=()=>{for(let i=0;i<25;i++)trainStep();render();};
+document.getElementById('reinit').onclick=()=>{S.seed++;initNet();render();};
+document.getElementById('optFolds').onchange=e=>{S.folds=e.target.checked;drawMain();};
+document.getElementById('optSel').onchange=e=>{S.showSel=e.target.checked;drawMain();};
+document.getElementById('optPts').onchange=e=>{S.pts=e.target.checked;drawLayers();};
+layersEl.addEventListener('click',e=>{
+  const inc=e.target.closest('[data-inc]'),dec=e.target.closest('[data-dec]');
+  if(inc||dec){const l=+(inc||dec).dataset[inc?'inc':'dec'];S.widths[l]=Math.max(1,Math.min(6,S.widths[l]+(inc?1:-1)));
+    initNet();buildLayers();for(let i=0;i<120;i++)trainStep();render();return;}
+  const nb=e.target.closest('.neuron');if(nb){S.sel={l:+nb.dataset.l,n:+nb.dataset.n};markSel();drawMain();drawEqs();drawNet();}
+});
+
+/* theme changes */
+const retheme=()=>{readColors();if(grid){drawMain();drawLayers();drawNet();}};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',retheme);
+new MutationObserver(retheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{drawMain();drawLayers();drawNet();},120);});
+
+/* loop */
+let frame=0,autoStopped=false;
+function loop(){
+  if(S.running){for(let i=0;i<3;i++)trainStep();if(++frame%2===0)render();
+    if(S.epoch>=6000&&!autoStopped){autoStopped=true;S.running=false;setPlay();render();}}
+  requestAnimationFrame(loop);}
+
+readColors();markDs();noiseOut.textContent=S.noise.toFixed(2);setPlay();
+rebuild();
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>
